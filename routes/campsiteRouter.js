@@ -8,7 +8,8 @@ campsiteRouter
 	.route("/")
 
 	.get((req, res, next) => {
-		Campsite.find()
+		Campsite.find();
+		console
 			.then((campsites) => {
 				res.statusCode = 200;
 				res.setHeader("Content-Type", "application/jason");
