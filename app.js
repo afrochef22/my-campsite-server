@@ -1,20 +1,25 @@
+// Middlewares and core modules
 var createError = require("http-errors");
 var express = require("express");
 var path = require("path");
 var logger = require("morgan");
 const passport = require("passport");
-const config = require("./config");
+const mongoose = require("mongoose");
 
+// Importing relevant files we need
+// './' == current working directory
+const config = require("./config");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 const campsiteRouter = require("./routes/campsiteRouter");
 const promotionRouter = require("./routes/promotionRouter");
 const partnerRouter = require("./routes/partnerRouter");
 
-const mongoose = require("mongoose");
-
+// Databasee configuration
 const url = config.mongoUrl;
 const connect = mongoose.connect(url, {
+	// Optional, to get rid of errors when starting your application
+	// Why? Because some of these methods have been deprecated.
 	useCreateIndex: true,
 	useFindAndModify: false,
 	useNewUrlParser: true,
@@ -26,24 +31,25 @@ connect.then(
 	(err) => console.log(err)
 );
 
+// Using express middleware
 var app = express();
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
+app.use(express.static(path.join(__dirname, "public")));
 
+app.use(passport.initialize()); // Express to use Passport middleware
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser("12345-67890-09876-54321"));
 
-app.use(passport.initialize());
-
+// Conntecting to our Routers
+// 1st arguement is usually what we call the starting point and with every strting point
+// you need an endpoint.
+// 2nd arguement is going to be a javascript file we imported.
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-
-app.use(express.static(path.join(__dirname, "public")));
-
 app.use("/campsites", campsiteRouter);
 app.use("/promotions", promotionRouter);
 app.use("/partners", partnerRouter);
