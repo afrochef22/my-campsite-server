@@ -61,3 +61,13 @@ exports.verifyAdmin = (req, res, next) => {
 		return next(err);
 	}
 };
+
+exports.verifyLoggedIn = (req, res, next) => {
+	if (req.user.isLoggedIn) {
+		return next();
+	} else {
+		const err = new Error("You must be logged in to perform this operation!");
+		res.statusCode = 403;
+		return next(err);
+	}
+};

@@ -76,6 +76,14 @@ router.post("/signup", (req, res) => {
 // To authenticate the username and password of the User
 router.post("/login", passport.authenticate("local"), (req, res) => {
 	const token = authenticate.getToken({ _id: req.user._id });
+	User.findByIdAndUpdate(
+		req.user._id,
+		{ $set: { isLoggedIn: true } },
+		{ runValidators: true },
+		(err) => {
+			console.log(err);
+		}
+	);
 	res.statusCode = 200;
 	res.setHeader("Content-type", "application/json");
 	res.json({
@@ -86,11 +94,15 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
 });
 
 router.post("/logout", authenticate.verifyUser, (req, res, next) => {
-	console.log(req.user);
-	req.logout();
-	console.log(req.user);
+	User.findByIdAndUpdate(
+		req.user._id,
+		{ $set: { isLoggedIn: false } },
+		{ runValidators: true },
+		(err) => {
+			console.log(err);
+		}
+	);
 	res.redirect("/");
-	console.log(req.user);
 });
 
 module.exports = router;

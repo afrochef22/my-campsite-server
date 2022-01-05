@@ -17,6 +17,10 @@ const userSchema = new Schema({
 		type: Boolean,
 		default: false,
 	},
+	isLoggedIn: {
+		type: Boolean,
+		default: false,
+	},
 });
 
 userSchema.plugin(passportLocalMongoose); // Encrypts the password
