@@ -17,18 +17,23 @@ promotionRouter
 			.catch((err) => next(err));
 	})
 
-	.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-		Promotion.create(req.body)
-			.then((promotion) => {
-				console.log("Promotion Created", promotion);
-				res.statusCode = 200;
-				res.setHeader("Content-Type", "application/json");
-				res.json(promotion);
-			})
-			.catch((err) => next(err));
-	})
+	.post(
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res, next) => {
+			Promotion.create(req.body)
+				.then((promotion) => {
+					console.log("Promotion Created", promotion);
+					res.statusCode = 200;
+					res.setHeader("Content-Type", "application/json");
+					res.json(promotion);
+				})
+				.catch((err) => next(err));
+		}
+	)
 
-	.put(authenticate.verifyUser, (req, res) => {
+	.put(authenticate.verifyUser, authenticate.verifyLoggedIn, (req, res) => {
 		res.statusCode = 403;
 		res.end("PUT operations not supported on /promotions.");
 	})
@@ -36,6 +41,7 @@ promotionRouter
 	.delete(
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
 		(req, res, next) => {
 			Promotion.deleteMany()
 				.then((response) => {
@@ -60,30 +66,36 @@ promotionRouter
 			.catch((err) => next(err));
 	})
 
-	.post(authenticate.verifyUser, (req, res) => {
+	.post(authenticate.verifyUser, authenticate.verifyLoggedIn, (req, res) => {
 		res.statusCode = 403;
 		res.end(
 			`POST operation not supported on /promotions/${req.params.promotionId}`
 		);
 	})
 
-	.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-		Promotion.findByIdAndUpdate(
-			req.params.promotionId,
-			{ $set: req.body },
-			{ new: true }
-		)
-			.then((partner) => {
-				res.statusCode = 200;
-				res.setHeader("Content-Type", "application/json");
-				res.json(partner);
-			})
-			.catch((err) => next(err));
-	})
+	.put(
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res, next) => {
+			Promotion.findByIdAndUpdate(
+				req.params.promotionId,
+				{ $set: req.body },
+				{ new: true }
+			)
+				.then((partner) => {
+					res.statusCode = 200;
+					res.setHeader("Content-Type", "application/json");
+					res.json(partner);
+				})
+				.catch((err) => next(err));
+		}
+	)
 
 	.delete(
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
 		(req, res, next) => {
 			Promotion.findByIdAndDelete(req.params.promotionId)
 				.then((response) => {

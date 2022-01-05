@@ -15,6 +15,7 @@ router.get(
 	"/",
 	authenticate.verifyUser,
 	authenticate.verifyAdmin,
+	authenticate.verifyLoggedIn,
 	function (req, res, next) {
 		// Finds all our Users in our database.
 		// Mongoose middleware returns a Promise everytime. .then .catch

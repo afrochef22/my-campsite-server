@@ -16,18 +16,23 @@ partnerRouter
 			.catch((err) => next(err));
 	})
 
-	.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-		Partner.create(req.body)
-			.then((partner) => {
-				console.log("Partner Created", partner);
-				res.statusCode = 200;
-				res.setHeader("Content-Type", "application/jason");
-				res.json(partner);
-			})
-			.catch((err) => next(err));
-	})
+	.post(
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res, next) => {
+			Partner.create(req.body)
+				.then((partner) => {
+					console.log("Partner Created", partner);
+					res.statusCode = 200;
+					res.setHeader("Content-Type", "application/jason");
+					res.json(partner);
+				})
+				.catch((err) => next(err));
+		}
+	)
 
-	.put(authenticate.verifyUser, (req, res) => {
+	.put(authenticate.verifyUser, authenticate.verifyLoggedIn, (req, res) => {
 		res.statusCode = 403;
 		res.end("PUT operations not supported on /partners.");
 	})
@@ -35,6 +40,7 @@ partnerRouter
 	.delete(
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
 		(req, res, next) => {
 			Partner.deleteMany()
 				.then((response) => {
@@ -59,37 +65,47 @@ partnerRouter
 			.catch((err) => next(err));
 	})
 
-	.post(authenticate.verifyUser, (req, res) => {
+	.post(authenticate.verifyUser, authenticate.verifyLoggedIn, (req, res) => {
 		res.statusCode = 403;
 		res.end(
 			`POST operation not supported on /partners/${req.params.partnerId}`
 		);
 	})
 
-	.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-		Partner.findByIdAndUpdate(
-			req.params.partnerId,
-			{
-				$set: req.body,
-			},
-			{ new: true }
-		)
-			.then((partner) => {
-				res.statusCode = 200;
-				res.setHeader("Content-Type", "application/json");
-				res.json(partner);
-			})
-			.catch((err) => next(err));
-	})
+	.put(
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res, next) => {
+			Partner.findByIdAndUpdate(
+				req.params.partnerId,
+				{
+					$set: req.body,
+				},
+				{ new: true }
+			)
+				.then((partner) => {
+					res.statusCode = 200;
+					res.setHeader("Content-Type", "application/json");
+					res.json(partner);
+				})
+				.catch((err) => next(err));
+		}
+	)
 
-	.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
-		Partner.findByIdAndDelete(req.params.partnerId)
-			.then((response) => {
-				res.statusCode = 200;
-				res.setHeader("Content-Type", "application/json");
-				res.json(response);
-			})
-			.catch((err) => next(err));
-	});
+	.delete(
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res) => {
+			Partner.findByIdAndDelete(req.params.partnerId)
+				.then((response) => {
+					res.statusCode = 200;
+					res.setHeader("Content-Type", "application/json");
+					res.json(response);
+				})
+				.catch((err) => next(err));
+		}
+	);
 
 module.exports = partnerRouter;
