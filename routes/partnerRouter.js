@@ -2,11 +2,13 @@ const express = require("express");
 const partnerRouter = express.Router();
 const Partner = require("../models/partner");
 const authenticate = require("../authenticate");
+const cors = require("./cors");
 
 partnerRouter
 	.route("/")
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 
-	.get((req, res, next) => {
+	.get(cors.cors, (req, res, next) => {
 		Partner.find()
 			.then((partners) => {
 				res.statusCode = 200;
@@ -17,6 +19,7 @@ partnerRouter
 	})
 
 	.post(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -32,12 +35,19 @@ partnerRouter
 		}
 	)
 
-	.put(authenticate.verifyUser, authenticate.verifyLoggedIn, (req, res) => {
-		res.statusCode = 403;
-		res.end("PUT operations not supported on /partners.");
-	})
+	.put(
+		cors.corsWithOptions,
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res) => {
+			res.statusCode = 403;
+			res.end("PUT operations not supported on /partners.");
+		}
+	)
 
 	.delete(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -54,8 +64,9 @@ partnerRouter
 
 partnerRouter
 	.route("/:partnerId")
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 
-	.get((req, res, next) => {
+	.get(cors.cors, (req, res, next) => {
 		Partner.findById(req.params.partnerId)
 			.then((partner) => {
 				res.statusCode = 200;
@@ -65,14 +76,21 @@ partnerRouter
 			.catch((err) => next(err));
 	})
 
-	.post(authenticate.verifyUser, authenticate.verifyLoggedIn, (req, res) => {
-		res.statusCode = 403;
-		res.end(
-			`POST operation not supported on /partners/${req.params.partnerId}`
-		);
-	})
+	.post(
+		cors.corsWithOptions,
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res) => {
+			res.statusCode = 403;
+			res.end(
+				`POST operation not supported on /partners/${req.params.partnerId}`
+			);
+		}
+	)
 
 	.put(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -94,6 +112,7 @@ partnerRouter
 	)
 
 	.delete(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,

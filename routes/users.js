@@ -6,6 +6,7 @@ const router = express.Router();
 const User = require("../models/user");
 const passport = require("passport");
 const authenticate = require("../authenticate");
+const cors = require("./cors");
 
 /* GET users listing. */
 // First arg == Endpoint
@@ -13,6 +14,7 @@ const authenticate = require("../authenticate");
 // 4th arg == Callback function
 router.get(
 	"/",
+	cors.corsWithOptions,
 	authenticate.verifyUser,
 	authenticate.verifyAdmin,
 	authenticate.verifyLoggedIn,
@@ -32,7 +34,7 @@ router.get(
 
 // 1st arg == Endpoint
 // 2nd arg == Callbacuk function
-router.post("/signup", (req, res) => {
+router.post("/signup", cors.corsWithOptions, (req, res) => {
 	// Uses Passport strategy to register our User.
 	User.register(
 		new User({ username: req.body.username }),
@@ -75,35 +77,45 @@ router.post("/signup", (req, res) => {
 // 1st arg == endpoint
 // 2nd arg == Middleware to do what?
 // To authenticate the username and password of the User
-router.post("/login", passport.authenticate("local"), (req, res) => {
-	const token = authenticate.getToken({ _id: req.user._id });
-	User.findByIdAndUpdate(
-		req.user._id,
-		{ $set: { isLoggedIn: true } },
-		{ runValidators: true },
-		(err) => {
-			console.log(err);
-		}
-	);
-	res.statusCode = 200;
-	res.setHeader("Content-type", "application/json");
-	res.json({
-		success: true,
-		token: token,
-		status: "You are successfully logged in!",
-	});
-});
+router.post(
+	"/login",
+	cors.corsWithOptions,
+	passport.authenticate("local"),
+	(req, res) => {
+		const token = authenticate.getToken({ _id: req.user._id });
+		User.findByIdAndUpdate(
+			req.user._id,
+			{ $set: { isLoggedIn: true } },
+			{ runValidators: true },
+			(err) => {
+				console.log(err);
+			}
+		);
+		res.statusCode = 200;
+		res.setHeader("Content-type", "application/json");
+		res.json({
+			success: true,
+			token: token,
+			status: "You are successfully logged in!",
+		});
+	}
+);
 
-router.post("/logout", authenticate.verifyUser, (req, res, next) => {
-	User.findByIdAndUpdate(
-		req.user._id,
-		{ $set: { isLoggedIn: false } },
-		{ runValidators: true },
-		(err) => {
-			console.log(err);
-		}
-	);
-	res.redirect("/");
-});
+router.post(
+	"/logout",
+	cors.corsWithOptions,
+	authenticate.verifyUser,
+	(req, res, next) => {
+		User.findByIdAndUpdate(
+			req.user._id,
+			{ $set: { isLoggedIn: false } },
+			{ runValidators: true },
+			(err) => {
+				console.log(err);
+			}
+		);
+		res.redirect("/");
+	}
+);
 
 module.exports = router;

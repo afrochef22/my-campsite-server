@@ -2,13 +2,15 @@ const express = require("express");
 const { response } = require("../app");
 const Campsite = require("../models/campsite");
 const authenticate = require("../authenticate");
+const cors = require("./cors");
 
 const campsiteRouter = express.Router();
 
 campsiteRouter
 	.route("/")
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 
-	.get((req, res, next) => {
+	.get(cors.cors, (req, res, next) => {
 		Campsite.find()
 			.populate("comments.author")
 			.then((campsites) => {
@@ -19,8 +21,8 @@ campsiteRouter
 			.catch((err) => next(err));
 	})
 
-	// The only route you cant access if you  logout ---------------------------------------
 	.post(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -36,12 +38,19 @@ campsiteRouter
 		}
 	)
 
-	.put(authenticate.verifyUser, (req, res) => {
-		res.statusCode = 403;
-		res.end("PUT operations not supported on /campsites.");
-	})
+	.put(
+		cors.corsWithOptions,
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res) => {
+			res.statusCode = 403;
+			res.end("PUT operations not supported on /campsites.");
+		}
+	)
 
 	.delete(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -70,12 +79,17 @@ campsiteRouter
 			.catch((err) => next(err));
 	})
 
-	.post(authenticate.verifyUser, authenticate.verifyLoggedIn, (req, res) => {
-		res.statusCode = 403;
-		res.end(
-			`POST operation not supported on /campsites/${req.params.campsiteId}`
-		);
-	})
+	.post(
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res) => {
+			res.statusCode = 403;
+			res.end(
+				`POST operation not supported on /campsites/${req.params.campsiteId}`
+			);
+		}
+	)
 
 	.put(
 		authenticate.verifyUser,
@@ -161,12 +175,17 @@ campsiteRouter
 		}
 	)
 
-	.put(authenticate.verifyUser, authenticate.verifyLoggedIn, (req, res) => {
-		res.statusCode = 403;
-		res.end(
-			`PUT operations not supported on /campsites/${req.params.campsiteId}/comments.`
-		);
-	})
+	.put(
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res) => {
+			res.statusCode = 403;
+			res.end(
+				`PUT operations not supported on /campsites/${req.params.campsiteId}/comments.`
+			);
+		}
+	)
 
 	.delete(
 		authenticate.verifyUser,
@@ -221,12 +240,17 @@ campsiteRouter
 			.catch((err) => next(err));
 	})
 
-	.post(authenticate.verifyUser, authenticate.verifyLoggedIn, (req, res) => {
-		res.statusCode = 403;
-		res.end(
-			`PUT opertation not supported on /campsites/${req.params.campsiteId}/comments/${req.params.commentId}`
-		);
-	})
+	.post(
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res) => {
+			res.statusCode = 403;
+			res.end(
+				`PUT opertation not supported on /campsites/${req.params.campsiteId}/comments/${req.params.commentId}`
+			);
+		}
+	)
 
 	.put(
 		authenticate.verifyUser,

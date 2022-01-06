@@ -3,11 +3,13 @@ const { response } = require("../app");
 const promotionRouter = express.Router();
 const Promotion = require("../models/promotion");
 const authenticate = require("../authenticate");
+const cors = require("./cors");
 
 promotionRouter
 	.route("/")
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 
-	.get((req, res, next) => {
+	.get(cors.cors, (req, res, next) => {
 		Promotion.find()
 			.then((promotions) => {
 				res.statusCode = 200;
@@ -18,6 +20,7 @@ promotionRouter
 	})
 
 	.post(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -33,12 +36,19 @@ promotionRouter
 		}
 	)
 
-	.put(authenticate.verifyUser, authenticate.verifyLoggedIn, (req, res) => {
-		res.statusCode = 403;
-		res.end("PUT operations not supported on /promotions.");
-	})
+	.put(
+		cors.corsWithOptions,
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res) => {
+			res.statusCode = 403;
+			res.end("PUT operations not supported on /promotions.");
+		}
+	)
 
 	.delete(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -55,8 +65,9 @@ promotionRouter
 
 promotionRouter
 	.route("/:promotionId")
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 
-	.get((req, res, next) => {
+	.get(cors.cors, (req, res, next) => {
 		Promotion.findById(req.params.promotionId)
 			.then((promotion) => {
 				res.statusCode = 200;
@@ -66,14 +77,21 @@ promotionRouter
 			.catch((err) => next(err));
 	})
 
-	.post(authenticate.verifyUser, authenticate.verifyLoggedIn, (req, res) => {
-		res.statusCode = 403;
-		res.end(
-			`POST operation not supported on /promotions/${req.params.promotionId}`
-		);
-	})
+	.post(
+		cors.corsWithOptions,
+		authenticate.verifyUser,
+		authenticate.verifyAdmin,
+		authenticate.verifyLoggedIn,
+		(req, res) => {
+			res.statusCode = 403;
+			res.end(
+				`POST operation not supported on /promotions/${req.params.promotionId}`
+			);
+		}
+	)
 
 	.put(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -93,6 +111,7 @@ promotionRouter
 	)
 
 	.delete(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
