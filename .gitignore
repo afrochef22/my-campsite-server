@@ -2,3 +2,4 @@ node_modules
 Assignment.txt
 bin/server.cert
 bin/server.key
+secret.js

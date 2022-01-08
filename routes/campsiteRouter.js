@@ -67,8 +67,9 @@ campsiteRouter
 
 campsiteRouter
 	.route("/:campsiteId")
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 
-	.get((req, res, next) => {
+	.get(cors.cors, (req, res, next) => {
 		Campsite.findById(req.params.campsiteId)
 			.populate("comments.author")
 			.then((campsite) => {
@@ -80,6 +81,7 @@ campsiteRouter
 	})
 
 	.post(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -92,6 +94,7 @@ campsiteRouter
 	)
 
 	.put(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -113,6 +116,7 @@ campsiteRouter
 	)
 
 	.delete(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -129,7 +133,9 @@ campsiteRouter
 
 campsiteRouter
 	.route("/:campsiteId/comments")
-	.get((req, res, next) => {
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+
+	.get(cors.cors, (req, res, next) => {
 		Campsite.findById(req.params.campsiteId)
 			.populate("comments.author")
 
@@ -148,6 +154,7 @@ campsiteRouter
 	})
 
 	.post(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyLoggedIn,
 		authenticate.verifyLoggedIn,
@@ -176,6 +183,7 @@ campsiteRouter
 	)
 
 	.put(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -188,6 +196,7 @@ campsiteRouter
 	)
 
 	.delete(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -218,8 +227,9 @@ campsiteRouter
 
 campsiteRouter
 	.route("/:campsiteId/comments/:commentId")
+	.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 
-	.get((req, res, next) => {
+	.get(cors.cors, (req, res, next) => {
 		Campsite.findById(req.params.campsiteId)
 			.populate("comments.author")
 			.then((campsite) => {
@@ -241,6 +251,7 @@ campsiteRouter
 	})
 
 	.post(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyAdmin,
 		authenticate.verifyLoggedIn,
@@ -253,6 +264,7 @@ campsiteRouter
 	)
 
 	.put(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyLoggedIn,
 		(req, res, next) => {
@@ -301,6 +313,7 @@ campsiteRouter
 	)
 
 	.delete(
+		cors.corsWithOptions,
 		authenticate.verifyUser,
 		authenticate.verifyLoggedIn,
 		(req, res, next) => {

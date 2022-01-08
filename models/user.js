@@ -21,6 +21,7 @@ const userSchema = new Schema({
 		type: Boolean,
 		default: false,
 	},
+	facebookId: String,
 });
 
 userSchema.plugin(passportLocalMongoose); // Encrypts the password
